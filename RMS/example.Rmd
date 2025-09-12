@@ -1,0 +1,48 @@
+---
+title: "example"
+output: html_document
+---
+
+### RMD Set-Up
+
+The first chunk is where knitr options go, and the second line is the most critical. Typically RMDs run out of their own directory, but because I have data and code separated, that can make navigation complicated. This normalizePath just resets the RMD path to the main directory for the repository where the R Project is, so we can navigate more easily to data and code.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_knit$set(root.dir = normalizePath("../"))
+```
+
+
+Once the pathing is set, we can run the config.R file to initialize the Outputs subdirectories, set up iteration versioning, and load packages. Look inside this file for more information on how this is setup.
+
+NOTE: Because I use date-based version folders, if you want to do the same, make sure you change the date in the config file **before** running source.
+```{r config, echo = FALSE}
+source("R/config.R")
+```
+
+With that done, you should now have all folders created and available to put data in.
+
+Now I'll go into some examples for accessing data and creating output figures, but from here on out it's basically the same as working in a normal R project.
+
+First make a demo dataset
+
+```{r make_df, echo = FALSE}
+species <- c("A", "B", "C", "D")
+count <- c("14", "36", "2", "28")
+demo <- data.frame(Species = species, Count = count)
+```
+
+Make a bar plot of the count data and write the image to our figure output folder
+```{r plot, echo = FALSE}
+ggplot(demo, aes(x = Species, y = Count)) + 
+  geom_bar(stat = "identity")
+
+# Save this plot to an object
+plot <- ggplot(demo, aes(x = Species, y = Count)) + 
+  geom_bar(stat = "identity")
+
+# Now save the plot to our figures folder
+ggsave("plot.png", plot, path = path_fig, width = 6, height = 4)
+```
+
+The only function for writing/saving an object from R to a folder that I haven't been able to use "path = path_shortcut" for is saveRDS. saveRDS still needs an absolute path as far as I've been able to test, unfortunately, but beyond that the path shortcuts should work.
