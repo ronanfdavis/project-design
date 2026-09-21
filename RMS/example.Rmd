@@ -9,14 +9,16 @@ The first chunk is where knitr options go, and the second line is the most criti
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
-knitr::opts_knit$set(root.dir = normalizePath("../"))
+knitr::opts_knit$set(root.dir = normalizePath("../")) # Again, don't skip this line - because the R Project working directory is set as "...GitHub/project-design/" but this .RMD is under "...GitHub/project-design/RMS/", this sets the document working directory backwards one step to be the same as the R Project file ("...GitHub/project-design/"). This way I don't have to put "../" in front of every single file or path call
 ```
 
 
 Once the pathing is set, we can run the config.R file to initialize the Outputs subdirectories, set up iteration versioning, and load packages. Look inside this file for more information on how this is setup.
 
-NOTE: Because I use date-based version folders, if you want to do the same, make sure you change the date in the config file **before** running source.
+NOTE: Because I use date-based version folders, if you want to do the same, make sure you change the date here **before** running source.
 ```{r config, echo = FALSE}
+### Set the date in YYYY-MM-DD format:
+date <- "2025-06-17"
 source("R/config.R")
 ```
 
@@ -45,4 +47,19 @@ plot <- ggplot(demo, aes(x = Species, y = Count)) +
 ggsave("plot.png", plot, path = path_fig, width = 6, height = 4)
 ```
 
-The only function for writing/saving an object from R to a folder that I haven't been able to use "path = path_shortcut" for is saveRDS. saveRDS still needs an absolute path as far as I've been able to test, unfortunately, but beyond that the path shortcuts should work.
+Some R packages output objects that don't fit neatly into a ggsave or write.csv function, but I still want to save them as intermediary backups or for workflow verification, and saveRDS() is useful for that.
+To make saveRDS work with relative pathing, it's easiest to first pass the name and output path as a vector, and then use that vector as an input.
+
+```{r}
+ExportPath <- paste(path_out, "RDS_export.rds", sep = "/") # pastes our output path and a name for our RDS object with / as a separator
+ExportPath # Now this appears as a complete path + file name
+
+saveRDS(demo, ExportPath) # We'll use the demo df for the test, even though it could also be exported with write.csv()
+
+# To load an RDS, you would need to create the file path and name again, then call the output folder
+ExportPath <- paste(path_out, "RDS_export.rds", sep = "/") # Pretend like we didn't just do this 
+ExportPath
+demo2 <- readRDS(ExportPath, path_out)
+```
+
+

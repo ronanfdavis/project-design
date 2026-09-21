@@ -31,9 +31,6 @@ suppressPackageStartupMessages({
 ### Set the base location:
 base <- "Data/Outputs"
 
-### Set the date in YYYY-MM-DD format:
-date <- "2025-06-17"
-
 ### Set the type of folder, for figures or interim objects:
 interim <- "InterimObjects"
 figures <- "Figures"
